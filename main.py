@@ -79,7 +79,7 @@ def main():
             st.subheader(pdf_data[0], divider="rainbow")
             pdf_path = pdf_data[1]
             
-            pdf_display = f'<iframe src="https://res.cloudinary.com/triplet/image/upload/Watcher/erthyd.pdf" width="700" height="900" type="application/pdf"></iframe>'
+            pdf_display = f'<iframe src="https://www.res.cloudinary.com/triplet/image/upload/v1738756158/Watcher/erthyd.pdf" width="700" height="900" type="application/pdf"></iframe>'
             st.markdown(pdf_display, unsafe_allow_html=True)
 
 if __name__ == "__main__":
