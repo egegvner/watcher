@@ -77,10 +77,10 @@ def main():
 
         if pdf_data:
             st.subheader(pdf_data[0], divider="rainbow")
-            with st.container(border=True):
-                streamlit_pdf_viewer.pdf_viewer(pdf_data[1], render_text=True)
-        else:
-            st.warning("⚠️ No PDF available for this edition.")
+            pdf_path = pdf_data[1]
+            
+            pdf_display = f'<iframe src="{pdf_path}" width="700" height="900" type="application/pdf"></iframe>'
+            st.markdown(pdf_display, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     if "admin" not in st.session_state:
