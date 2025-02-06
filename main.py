@@ -72,7 +72,7 @@ def main():
         st.subheader(pdf_data[0], divider="rainbow")
         with st.container(border=True):
             if pdf_data:
-                streamlit_pdf_viewer.pdf_viewer(pdf_data[1], render_text=True)
+                streamlit_pdf_viewer.pdf_viewer(pdf_data[1])
             else:
                 st.warning("⚠️ No PDF available for this edition.")
 
