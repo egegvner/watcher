@@ -57,8 +57,6 @@ def admin_view():
         st.rerun()
 
 def main():
-    c.execute("DROP TABLE editions")
-    conn.commit()
     if st.session_state.admin == 1:
         admin_view()
     else:
