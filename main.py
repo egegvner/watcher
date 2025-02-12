@@ -5,7 +5,6 @@ import pandas as pd
 
 PASSCODE = 1234
 
-# Database Connection
 conn = sqlite3.connect("watcher.db", check_same_thread=False)
 c = conn.cursor()
 
@@ -50,7 +49,7 @@ def admin_view():
             if edition and date and path:
                 c.execute("INSERT INTO editions (edition, date, path) VALUES (?, ?, ?)", (edition, date, path))
                 conn.commit()
-                st.cache_data.clear()  # Clear cache to update editions list
+                st.cache_data.clear()
 
     st.subheader("Editions", divider="rainbow")
     df = pd.DataFrame(editions, columns=["Edition ID", "Edition Number", "Date", "File Path"])
@@ -60,29 +59,32 @@ def admin_view():
             c.execute("UPDATE OR IGNORE editions SET edition = ?, date = ?, path = ? WHERE edition_id = ?", 
                       (row["Edition Number"], row["Date"], row["File Path"], row["Edition ID"]))
         conn.commit()
-        st.cache_data.clear()  # Clear cache to refresh editions
+        st.cache_data.clear()
         st.rerun()
 
 def main():
     if st.session_state.admin == 1:
         admin_view()
     else:
-        editions = fetch_editions()  # Cached database fetch
-        if st.button("Upload - Only for John"):
-            access_admin_dialog()
-        st.header("📖 Weekly Watcher Viewer", divider="rainbow")
-        st.subheader("📚 View an Edition")
-        edition = st.selectbox("Select an Edition", options=editions)
-        pdf_data = fetch_pdf(edition)  # Cached fetch
+        editions = fetch_editions()
 
-        if pdf_data:
-            st.subheader(pdf_data[0], divider="rainbow")
-            with st.container(border=True):
-                with st.spinner('Loading PDF...'):
-                    # The spinner will show while the PDF is being loaded and displayed
-                    streamlit_pdf_viewer.pdf_viewer(pdf_data[1], render_text=True)
-        else:
-            st.warning("⚠️ No PDF available for this edition.")
+        c1, c2 = st.columns(2)
+        with c1:
+            if st.button("Upload - Only for John"):
+                access_admin_dialog()
+            st.header("📖 Weekly Watcher Viewer", divider="rainbow")
+            st.subheader("📚 View an Edition")
+            edition = st.selectbox("Select an Edition", options=editions)
+            pdf_data = fetch_pdf(edition)
+
+        with c2:
+            if pdf_data:
+                st.subheader(pdf_data[0], divider="rainbow")
+                with st.container(border=True):
+                    with st.spinner('Loading PDF...'):
+                        streamlit_pdf_viewer.pdf_viewer(pdf_data[1], render_text=True)
+            else:
+                st.warning("⚠️ No PDF available for this edition.")
 
 if __name__ == "__main__":
     if "admin" not in st.session_state:
