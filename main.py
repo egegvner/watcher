@@ -43,7 +43,7 @@ def admin_view():
         st.rerun()
 
     with st.expander("New Edition"):
-        edition = st.text_input("", label_visibility="collapsed", placeholder="Edition number")
+        edition = st.number_input("", label_visibility="collapsed", placeholder="Edition number", value=None)
         date = st.text_input("", label_visibility="collapsed", placeholder="Date")
         path = st.text_input("", label_visibility="collapsed", placeholder="Path i.e. './example.pdf'")
         if st.button("Upload New Edition", type="primary", use_container_width=True):
@@ -77,8 +77,12 @@ def main():
 
         if pdf_data:
             st.subheader(pdf_data[0], divider="rainbow")
-            pdf_path = pdf_data[1]
-            streamlit_pdf_viewer.pdf_viewer(pdf_path)
+            with st.container(border=True):
+                with st.spinner('Loading PDF...'):
+                    # The spinner will show while the PDF is being loaded and displayed
+                    streamlit_pdf_viewer.pdf_viewer(pdf_data[1], render_text=True)
+        else:
+            st.warning("⚠️ No PDF available for this edition.")
 
 if __name__ == "__main__":
     if "admin" not in st.session_state:
