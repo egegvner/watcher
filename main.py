@@ -43,7 +43,7 @@ def admin_view():
         st.rerun()
 
     with st.expander("New Edition"):
-        edition = st.number_input("", label_visibility="collapsed", placeholder="Edition number", value=None)
+        edition = st.text_input("", label_visibility="collapsed", placeholder="Edition number")
         date = st.text_input("", label_visibility="collapsed", placeholder="Date")
         path = st.text_input("", label_visibility="collapsed", placeholder="Path i.e. './example.pdf'")
         if st.button("Upload New Edition", type="primary", use_container_width=True):
