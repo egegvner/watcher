@@ -74,6 +74,12 @@ def admin_view():
             st.cache_data.clear()
             st.rerun()
 
+        edition_id_to_delete = st.text_input("", label_visibility="collapsed", placeholder="Edition ID o Delete")
+        if st.button("Delete Edition", use_container_width=True):
+            c.execute("DELETE FROM editions WHERE edition_id = ?", (edition_id_to_delete,))
+            conn.commit()
+            st.rerun()
+
 def main():
     st.set_page_config(
         page_title="Watcher Viewer",
