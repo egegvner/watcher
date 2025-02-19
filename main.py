@@ -111,7 +111,7 @@ def main():
             st.text("")
             st.text("")
             st.subheader(f"{pdf_data[0]}: {pdf_data[1]}", divider="gray")
-            streamlit_pdf_viewer.pdf_viewer(pdf_data[1], render_text=True, height=2000)
+            streamlit_pdf_viewer.pdf_viewer(pdf_data[2], render_text=True, height=2000)
         else:
             st.warning("⚠️ No PDF available for this edition.")
 
