@@ -34,12 +34,12 @@ def fetch_editions():
 
 @st.cache_resource
 def fetch_pdf(edition):
-    c.execute("SELECT edition_number, date, path FROM editions WHERE edition = ?", (edition,))
+    c.execute("SELECT edition, date, path FROM editions WHERE edition = ?", (edition,))
     result = c.fetchone()
     return result if result else None
 
 def admin_view():
-    editions = c.execute("SELECT edition, edition, date, path FROM editions").fetchall()
+    editions = c.execute("SELECT edition_id, edition, date, path FROM editions").fetchall()
     if st.button("HOME", use_container_width=True):
         st.session_state.admin = 0
         st.session_state.section = "home"
