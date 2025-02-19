@@ -39,7 +39,7 @@ def fetch_pdf(edition):
     return result if result else None
 
 def admin_view():
-    editions = c.execute("SELECT edition_id, edition, date, path FROM editions").fetchall()
+    editions = c.execute("SELECT edition, edition, date, path FROM editions").fetchall()
     if st.button("HOME", use_container_width=True):
         st.session_state.admin = 0
         st.session_state.section = "home"
