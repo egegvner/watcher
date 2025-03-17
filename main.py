@@ -5,7 +5,6 @@ import pandas as pd
 import random
 import time
 import os
-import json
 
 PASSCODE = "01012024"
 
@@ -19,38 +18,6 @@ c.execute('''CREATE TABLE IF NOT EXISTS editions (
                 path TEXT
                 );''')
 conn.commit()
-
-def load_editions_from_json():
-    if os.path.exists("./editions.json"):
-        with open("./editions.json", "r") as f:
-            try:
-                editions_data = json.load(f)
-            except Exception as e:
-                st.error(f"Error loading JSON: {e}")
-                return
-        # Iterate over each edition in the JSON file
-        for edition in editions_data:
-            edition_id = edition.get("edition_id")
-            edition_number = edition.get("edition_number")
-            date = edition.get("date")
-            file_path = edition.get("file_path")
-            # Check if this edition already exists in the database
-            c.execute("SELECT path FROM editions WHERE edition_id = ?", (edition_id,))
-            result = c.fetchone()
-            if result:
-                # If file path is absent or empty, update it from JSON data
-                if not result[0]:
-                    c.execute("UPDATE editions SET path = ? WHERE edition_id = ?", (file_path, edition_id))
-            else:
-                # Insert the edition if it doesn't exist
-                c.execute("INSERT INTO editions (edition_id, edition, date, path) VALUES (?, ?, ?, ?)",
-                          (edition_id, edition_number, date, file_path))
-        conn.commit()
-
-# Ensure JSON is loaded only once per session
-if "json_loaded" not in st.session_state:
-    load_editions_from_json()
-    st.session_state.json_loaded = True
 
 @st.dialog("Admin")
 def access_admin_dialog():
@@ -80,45 +47,19 @@ def admin_view():
 
     c1, c2 = st.columns(2)
     with c1:
-        with st.container():
+        with st.container(border=True):
             edition = st.text_input("", label_visibility="collapsed", placeholder="Edition number")
             date = st.text_input("", label_visibility="collapsed", placeholder="Date")
             uploaded_file = st.file_uploader("Upload PDF", type="pdf")
             if st.button("Upload New Edition", type="primary", use_container_width=True):
                 with st.spinner("Uploading..."):
                     if edition and date and uploaded_file:
-                        # Save the uploaded file to the current working directory
                         file_path = os.path.join(os.getcwd(), uploaded_file.name)
                         with open(file_path, "wb") as f:
                             f.write(uploaded_file.getbuffer())
-                        # Generate a random edition_id
-                        edition_id = random.randint(100000, 999999)
-                        # Insert into the database
-                        c.execute("INSERT INTO editions (edition_id, edition, date, path) VALUES (?, ?, ?, ?)",
-                                  (edition_id, edition, date, file_path))
+                        c.execute("INSERT INTO editions (edition_id, edition, date, path) VALUES (?, ?, ?, ?)", (random.randint(100000, 999999), edition, date, file_path))
                         conn.commit()
                         st.cache_data.clear()
-
-                        # Update or create the editions.json file
-                        if os.path.exists("./editions.json"):
-                            try:
-                                with open("./editions.json", "r") as json_file:
-                                    editions_json = json.load(json_file)
-                            except Exception as e:
-                                st.error(f"Error reading ./editions.json: {e}")
-                                editions_json = []
-                        else:
-                            editions_json = []
-                        # Append the new edition
-                        new_record = {
-                            "edition_id": edition_id,
-                            "edition_number": edition,
-                            "date": date,
-                            "file_path": file_path
-                        }
-                        editions_json.append(new_record)
-                        with open("./editions.json", "w") as json_file:
-                            json.dump(editions_json, json_file, indent=4)
                     time.sleep(2)
                 st.rerun()
 
@@ -128,12 +69,12 @@ def admin_view():
         if st.button("Update Editions", use_container_width=True):
             for _, row in edited_df.iterrows():
                 c.execute("UPDATE OR IGNORE editions SET edition = ?, date = ?, path = ? WHERE edition_id = ?", 
-                          (row["Edition Number"], row["Date"], row["File Path"], row["Edition ID"]))
+                        (row["Edition Number"], row["Date"], row["File Path"], row["Edition ID"]))
             conn.commit()
             st.cache_data.clear()
             st.rerun()
 
-        edition_id_to_delete = st.text_input("", label_visibility="collapsed", placeholder="Edition ID to Delete")
+        edition_id_to_delete = st.text_input("", label_visibility="collapsed", placeholder="Edition ID o Delete")
         if st.button("Delete Edition", use_container_width=True):
             c.execute("DELETE FROM editions WHERE edition_id = ?", (edition_id_to_delete,))
             conn.commit()
@@ -155,7 +96,7 @@ def main():
         .t {
             font-family: 'Times New Roman', Times, serif;
         }
-    </style>
+        </style>
     """,
     unsafe_allow_html=True
     )
