@@ -21,9 +21,8 @@ c.execute('''CREATE TABLE IF NOT EXISTS editions (
 conn.commit()
 
 def load_editions_from_json():
-    # Check if editions.json exists
-    if os.path.exists("editions.json"):
-        with open("editions.json", "r") as f:
+    if os.path.exists("./editions.json"):
+        with open("./editions.json", "r") as f:
             try:
                 editions_data = json.load(f)
             except Exception as e:
@@ -101,12 +100,12 @@ def admin_view():
                         st.cache_data.clear()
 
                         # Update or create the editions.json file
-                        if os.path.exists("editions.json"):
+                        if os.path.exists("./editions.json"):
                             try:
-                                with open("editions.json", "r") as json_file:
+                                with open("./editions.json", "r") as json_file:
                                     editions_json = json.load(json_file)
                             except Exception as e:
-                                st.error(f"Error reading editions.json: {e}")
+                                st.error(f"Error reading ./editions.json: {e}")
                                 editions_json = []
                         else:
                             editions_json = []
@@ -118,7 +117,7 @@ def admin_view():
                             "file_path": file_path
                         }
                         editions_json.append(new_record)
-                        with open("editions.json", "w") as json_file:
+                        with open("./editions.json", "w") as json_file:
                             json.dump(editions_json, json_file, indent=4)
                     time.sleep(2)
                 st.rerun()
